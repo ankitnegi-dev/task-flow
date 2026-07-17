@@ -1,0 +1,71 @@
+// Prisma schema for TaskFlow application
+// Defines the data models, relations, and database configuration
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model: stores account information
+// Passwords are stored as bcrypt hashes - never plaintext
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  tasks     Task[]
+}
+
+// Task model: core entity of the application
+// Belongs to a User; can have many Tags via the TaskTag join table
+model Task {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  dueDate     DateTime?
+  priority    Priority   @default(Medium)
+  status      Status     @default(Pending)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  taskTags    TaskTag[]
+}
+
+// Tag model: reusable labels that can be applied to tasks
+// Color is stored as a hex string (e.g., "#6366f1")
+model Tag {
+  id       String    @id @default(uuid())
+  name     String
+  color    String    @default("#6366f1")
+  taskTags TaskTag[]
+}
+
+// TaskTag: explicit many-to-many join table between Task and Tag
+// Composite primary key prevents duplicate tag assignments
+model TaskTag {
+  taskId String
+  tagId  String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, tagId])
+}
+
+// Priority levels for tasks
+enum Priority {
+  High
+  Medium
+  Low
+}
+
+// Lifecycle status for tasks
+enum Status {
+  Pending
+  Completed
+}
