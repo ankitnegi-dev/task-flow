@@ -7,6 +7,7 @@ import {
   useSensor,
   useSensors,
   DragOverlay,
+  useDroppable,
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -56,8 +57,15 @@ function SortableTaskCard({ task, onEdit, onDelete, isSelected, onSelect }) {
 function KanbanColumn({ id, title, tasks, badgeColor, onEdit, onDelete, selectedTaskIds, onSelect, isOver }) {
   const taskIds = tasks.map((t) => t._id || t.id)
 
+  // Register this column itself as a droppable zone, using a distinct ID
+  // prefix so it can never collide with a real task ID, and so dropping
+  // directly on the column (not just on an existing card) works even
+  // when the column is empty.
+  const { setNodeRef } = useDroppable({ id: `column-${id}` })
+
   return (
     <div
+      ref={setNodeRef}
       className={`flex-1 min-w-0 rounded-xl border transition-colors duration-150 ${
         isOver
           ? 'border-indigo-400 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/10'
@@ -142,45 +150,46 @@ function KanbanBoard({ onEdit, onDelete }) {
     setActiveId(active.id)
   }
 
+  /** Resolve a dnd-kit `over.id` to the column name it represents. */
+const resolveColumn = (overId) => {
+  if (overId === 'column-Pending') return 'Pending'
+  if (overId === 'column-Completed') return 'Completed'
+  const task = tasks.find((t) => (t._id || t.id) === overId)
+  return task?.status === 'Completed' ? 'Completed' : 'Pending'
+}
+
   const handleDragOver = ({ over }) => {
-    if (!over) {
-      setOverColumn(null)
-      return
-    }
-    // Determine if dragging over the opposite column's header or an item in it
-    const overId = over.id
-    const overTask = tasks.find((t) => (t._id || t.id) === overId)
-    if (overTask) {
-      setOverColumn(overTask.status === 'Completed' ? 'Completed' : 'Pending')
-    }
-  }
-
-  const handleDragEnd = async ({ active, over }) => {
-    setActiveId(null)
+  if (!over) {
     setOverColumn(null)
-
-    if (!over) return
-
-    const activeTaskId = active.id
-    const overTaskId = over.id
-
-    const sourceColumn = getColumn(activeTaskId)
-    const destinationColumn = getColumn(overTaskId)
-
-    // Only act if dropped into a different column
-    if (sourceColumn === destinationColumn) return
-
-    const previousTasks = useTaskStore.getState().tasks
-    optimisticToggleStatus(activeTaskId)
-
-    try {
-      await toggleStatus(activeTaskId)
-      toast.success(destinationColumn === 'Completed' ? 'Task completed!' : 'Task set to pending')
-    } catch {
-      rollbackTasks(previousTasks)
-      toast.error('Failed to update task status')
-    }
+    return
   }
+  setOverColumn(resolveColumn(over.id))
+}
+
+const handleDragEnd = async ({ active, over }) => {
+  setActiveId(null)
+  setOverColumn(null)
+
+  if (!over) return
+
+  const activeTaskId = active.id
+  const sourceColumn = getColumn(activeTaskId)
+  const destinationColumn = resolveColumn(over.id)
+
+  // Only act if dropped into a different column
+  if (sourceColumn === destinationColumn) return
+
+  const previousTasks = useTaskStore.getState().tasks
+  optimisticToggleStatus(activeTaskId)
+
+  try {
+    await toggleStatus(activeTaskId)
+    toast.success(destinationColumn === 'Completed' ? 'Task completed!' : 'Task set to pending')
+  } catch {
+    rollbackTasks(previousTasks)
+    toast.error('Failed to update task status')
+  }
+}
 
   // Find the active task for the drag overlay
   const activeTask = activeId ? tasks.find((t) => (t._id || t.id) === activeId) : null

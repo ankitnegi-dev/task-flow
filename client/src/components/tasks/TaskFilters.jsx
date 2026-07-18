@@ -74,11 +74,11 @@ function TaskFilters() {
   }, [])
 
   const hasActiveFilters =
-    filters.status || filters.priority || (filters.tagIds?.length > 0)
+  filters.status || filters.priority || filters.search || (filters.tagIds?.length > 0)
 
-  const clearFilters = () => {
-    setFilters({ status: '', priority: '', tagIds: [] })
-  }
+const clearFilters = () => {
+  setFilters({ status: '', priority: '', search: '', tagIds: [] })
+}
 
   const toggleTagFilter = (tagId) => {
     const current = filters.tagIds || []
