@@ -63,7 +63,10 @@ Users can register, log in, and manage their own tasks: create, edit, delete, ma
 ![Dashboard](docs/screenshots/dashboard-light.png)
 
 ### Kanban Board
-![Kanban board](docs/screenshots/kanban-view.png)
+![Kanban Board](docs/screenshots/kanban-view.png)
+
+### Dark Mode
+![Dark Mode](docs/screenshots/dark-mode.png)
 
 ### Register
 ![Register Page](docs/screenshots/register.png)
