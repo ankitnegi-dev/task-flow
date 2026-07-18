@@ -15,6 +15,7 @@ Users can register, log in, and manage their own tasks: create, edit, delete, ma
 
 ## Table of Contents
 
+- [Live Demo](#live-demo)
 - [Tech Stack](#tech-stack)
 - [Features](#features)
 - [Screenshots](#screenshots)
@@ -24,6 +25,15 @@ Users can register, log in, and manage their own tasks: create, edit, delete, ma
 - [Database Schema](#database-schema)
 - [Project Structure](#project-structure)
 - [Notes and Known Limitations](#notes-and-known-limitations)
+
+## Live Demo
+
+- Frontend: [https://task-flow-lilac-zeta.vercel.app](https://task-flow-lilac-zeta.vercel.app)
+- Backend API: [https://task-flow-server-usas.onrender.com/api/health](https://task-flow-server-usas.onrender.com/api/health)
+
+Frontend is deployed on Vercel, backend and PostgreSQL on Render. Since the backend is on Render's free tier, the API may take up to a minute to wake up on the first request after a period of inactivity (cold start) - subsequent requests are fast.
+
+Demo credentials work on the live deployment too, see [below](#demo-credentials).
 
 ## Tech Stack
 
