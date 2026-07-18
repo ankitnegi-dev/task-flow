@@ -12,8 +12,9 @@ import EmptyState from '../ui/EmptyState'
  * Props:
  *   onEdit   - callback(task) to open edit modal
  *   onDelete - callback(task) to handle deletion
+ *   onAddTask - callback() to open add task modal
  */
-function TaskList({ onEdit, onDelete }) {
+function TaskList({ onEdit, onDelete, onAddTask }) {
   const tasks = useTaskStore((state) => state.tasks)
   const filters = useTaskStore((state) => state.filters)
   const selectedTaskIds = useTaskStore((state) => state.selectedTaskIds)
@@ -26,9 +27,10 @@ function TaskList({ onEdit, onDelete }) {
   if (tasks.length === 0) {
     return (
       <EmptyState
-        hasFilters={!!hasActiveFilters}
-        onClearFilters={hasActiveFilters ? () => useTaskStore.getState().setFilters({ status: '', priority: '', search: '', tagIds: [] }) : undefined}
-      />
+  hasFilters={!!hasActiveFilters}
+  onClearFilters={hasActiveFilters ? () => useTaskStore.getState().setFilters({ status: '', priority: '', search: '', tagIds: [] }) : undefined}
+  onAddTask={!hasActiveFilters ? onAddTask : undefined}
+/>
     )
   }
 

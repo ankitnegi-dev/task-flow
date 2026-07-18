@@ -204,9 +204,10 @@ function Dashboard() {
               />
             ) : (
               <TaskList
-                onEdit={openEditModal}
-                onDelete={handleDelete}
-              />
+  onEdit={openEditModal}
+  onDelete={handleDelete}
+  onAddTask={openAddModal}
+/>
             )}
 
             {/* Pagination */}
