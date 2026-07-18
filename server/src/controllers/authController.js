@@ -48,9 +48,9 @@ function setCookieToken(res, token) {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: COOKIE_MAX_AGE_MS,
-  });
+  })
 }
 
 /**
