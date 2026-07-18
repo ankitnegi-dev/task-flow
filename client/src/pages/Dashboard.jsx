@@ -248,7 +248,7 @@ function Dashboard() {
           </main>
 
           {/* ── Sidebar analytics (md+ only) ── */}
-          <aside className="hidden lg:block w-72 flex-shrink-0">
+          <aside className="w-full lg:w-72 flex-shrink-0 order-first lg:order-last">
             <Analytics onRefresh={fetchStats} />
           </aside>
         </div>
