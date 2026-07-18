@@ -51,13 +51,21 @@ function Dashboard() {
 
   // Fetch stats on mount and after task mutations
   const fetchStats = useCallback(async () => {
-    try {
-      const res = await getStats()
-      setStats(res.data)
-    } catch {
-      // Non-critical - analytics panel will show zeros
-    }
-  }, [setStats])
+  try {
+    const res = await getStats()
+    const raw = res.data
+    setStats({
+      total: raw.total ?? 0,
+      completed: raw.byStatus?.Completed ?? 0,
+      pending: raw.byStatus?.Pending ?? 0,
+      overdue: raw.overdueCount ?? 0,
+      byPriority: raw.byPriority ?? { High: 0, Medium: 0, Low: 0 },
+      completionRate: raw.completionRate ?? 0,
+    })
+  } catch {
+    // Non-critical - analytics panel will show zeros
+  }
+}, [setStats])
 
   useEffect(() => {
     fetchStats()
